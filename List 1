@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 24 16:54:15 2018
+
+@author: bartlomiejkos
+"""
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def zadanie1():
+    me = 9.109383e-31 # kg  # declaration of variables
+    hbar = 1.053571e-34 # Js
+    eV = 1.602176e-19 # J
+    n = 4
+    mx = me * 0.067
+    E = np.empty([n, 29])  # definition of 2D matrix to hold results
+    for ni in range(1, n + 1):   # iterating over energy lvls
+        for wi in range(-14, 15):  # iterating over well's width
+            if wi == 0:
+                continue
+            else:
+                Ei = (hbar**2 * np.pi**2 * ni**2) / (8 * mx * (wi/2)**2 * eV * 1e-9**2)  # i-th energy lvl
+                E[ni-1][wi+15-1] = Ei
+    E = np.transpose(E)
+    E=pd.DataFrame(E, columns=('n1','n2','n3','n4'))  # wrangling data
+    plt.plot(range(-14,15), E['n1'], 'ro')
+    plt.plot(range(-14,15), E['n2'], 'g+')
+    plt.plot(range(-14,15), E['n3'], 'y^')
+    plt.plot(range(-14,15), E['n4'], 'bs')
+    plt.xlabel('width (nm)')
+    plt.ylabel('energy (eV)')
+    plt.xlim(-18,18)
+    plt.show()
+    
+def zadanie2():
+    me = 9.109383e-31 # kg  # declaration of variables
+    hbar = 1.053571e-34 # Js
+    eV = 1.602176e-19 # J
+    V = [0.5, 1 , 2] # potential lvls
+    E = np.zeros([8,3])
+    j = 0
+    for i in V: # iterating over potential lvls
+        a = 1
+        ni = 1
+        while a == 1:
+            Ei = (hbar**2 * np.pi**2 * ni**2) / (2 * me * 0.067 * 10**2 * eV * 1e-9**2)  # i-th energy lvl
+            if Ei < i:    # checking whether Ei is still smaller than V0
+                print(Ei, i)    # energy lvl in accord to V0
+                E[ni-1][j] = Ei
+                ni = ni + 1
+            else:
+                a = 0
+        j = j + 1
+    PLOT(E)
+def PLOT(E):
+    plt.plot([0, 2], [E[0][0], E[0][0]], color='r', linestyle='--', linewidth=2)
+    plt.plot([0, 2], [E[1][0], E[1][0]], color='r', linestyle='--', linewidth=2)
+    plt.plot([2, 4], [E[0][1], E[0][1]], color='c', linestyle=':', linewidth=2)
+    plt.plot([2, 4], [E[1][1], E[1][1]], color='c', linestyle=':', linewidth=2)
+    plt.plot([2, 4], [E[2][1], E[2][1]], color='c', linestyle=':', linewidth=2)
+    plt.plot([2, 4], [E[3][1], E[3][1]], color='c', linestyle=':', linewidth=2)
+    plt.plot([4, 6], [E[0][2], E[0][2]], color='b', linestyle='-.', linewidth=2)
+    plt.plot([4, 6], [E[1][2], E[1][2]], color='b', linestyle='-.', linewidth=2)
+    plt.plot([4, 6], [E[2][2], E[2][2]], color='b', linestyle='-.', linewidth=2)
+    plt.plot([4, 6], [E[3][2], E[3][2]], color='b', linestyle='-.', linewidth=2)
+    plt.plot([4, 6], [E[4][2], E[4][2]], color='b', linestyle='-.', linewidth=2)
+    plt.plot([0, 6], [0, 0], color='k', linestyle='-', linewidth=3)
+    plt.ylabel('energy (eV)')
+    plt.show()
+    
+def zadanie3():
+    eV = 1.602176e-19 # J  # declaration of variables
+    E = [0.1, 0.15, 0.2, 0.25, 0.3,0.5, 6.5]
+    me = 9.109383e-31 # kg
+    hbar = 1.053571e-34 # Js
+    V0 = 0.334*eV
+    t = []
+    w = []
+    for e in E:
+        e = e*eV
+        if(e > V0):         # for the case when E is bigger than well's potential V0
+            for l in range(200, 1000):
+                k = (2*me*0.1*(e-V0)/hbar**2)
+                K = np.sqrt(k)
+                l = l/1000
+                T = 1/(1+(V0**2*np.sin(K*l*1e-9)**2)/(4*e*(e-V0)))
+                t.append(T)
+                w.append(l)
+        else:               # for the case when E is smaller than well's potential V0
+            for l in range(200, 1000):
+                k = (2*me*0.1*(V0-e)/hbar**2)
+                K = np.sqrt(k)
+                l = l/1000
+                T = 1/(1+(V0**2*np.sinh(K*l*1e-9)**2)/(4*e*(V0-e)))
+                t.append(T)
+                w.append(l)
+        e = e/eV
+        plt.plot(w, t, label="E=%s"%(e,))
+        w = []
+        t = []
+    plt.ylabel('T - transmission probability (%)')
+    plt.xlabel('width of a barrier (nm)')
+    plt.legend(bbox_to_anchor=(1,1), loc=2)
+    plt.show()
+    
+zadanie3()
