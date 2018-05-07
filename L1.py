@@ -10,6 +10,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+
+'''---------Applied Quantum Mechanics---------'''
+
+# Zadanie1
+'''
+Zbadać zależność czterech pierwszych poziomów energetycznych od szerokości studni w dla 
+elektronu w nieskończonej studni potencjału w GaAs (m*=0.067m). Rozważyć szerokości 
+1nm <w <30nm. Wyniki przedstawić na wykresie.
+'''
+
 def zadanie1():
     me = 9.109383e-31 # kg  # declaration of variables
     hbar = 1.053571e-34 # Js
@@ -34,7 +45,13 @@ def zadanie1():
     plt.ylabel('energy (eV)')
     plt.xlim(-18,18)
     plt.show()
-    
+# Zadanie2
+
+'''
+Skończona studnia kwantowa szerokości o 10nm . Znaleźć numerycznie wszystkie poziomy 
+energetyczne dla głębokości V0=0.5 eV, 1eV i 2eV. Przyjąć masę ładunku m*=0.067m.    
+'''
+
 def zadanie2():
     me = 9.109383e-31 # kg  # declaration of variables
     hbar = 1.053571e-34 # Js
@@ -48,7 +65,7 @@ def zadanie2():
         while a == 1:
             Ei = (hbar**2 * np.pi**2 * ni**2) / (2 * me * 0.067 * 10**2 * eV * 1e-9**2)  # i-th energy lvl
             if Ei < i:    # checking whether Ei is still smaller than V0
-                print(Ei, i)    # energy lvl in accord to V0
+                #print(Ei, i)    # energy lvl in accord to V0
                 E[ni-1][j] = Ei
                 ni = ni + 1
             else:
@@ -70,40 +87,50 @@ def PLOT(E):
     plt.plot([0, 6], [0, 0], color='k', linestyle='-', linewidth=3)
     plt.ylabel('energy (eV)')
     plt.show()
-    
+
+# Zadanie3
+'''
+Obliczyć współczynnik transmisji T przez barierę energetyczną dla następujących danych 
+mw=0.067 m0, mb=0.10 m0, V0= 0.334 eV. Zbadać T(E) dla kilku szerokości bariery w,
+ 2nm< w<10nm. Wyniki obliczeń przedstawić na wykresach.
+'''
+
 def zadanie3():
-    eV = 1.602176e-19 # J  # declaration of variables
-    E = [0.1, 0.15, 0.2, 0.25, 0.3,0.5, 6.5]
-    me = 9.109383e-31 # kg
-    hbar = 1.053571e-34 # Js
-    V0 = 0.334*eV
-    t = []
-    w = []
-    for e in E:
-        e = e*eV
-        if(e > V0):         # for the case when E is bigger than well's potential V0
-            for l in range(200, 1000):
-                k = (2*me*0.1*(e-V0)/hbar**2)
-                K = np.sqrt(k)
-                l = l/1000
-                T = 1/(1+(V0**2*np.sin(K*l*1e-9)**2)/(4*e*(e-V0)))
-                t.append(T)
-                w.append(l)
-        else:               # for the case when E is smaller than well's potential V0
-            for l in range(200, 1000):
-                k = (2*me*0.1*(V0-e)/hbar**2)
-                K = np.sqrt(k)
-                l = l/1000
-                T = 1/(1+(V0**2*np.sinh(K*l*1e-9)**2)/(4*e*(V0-e)))
-                t.append(T)
-                w.append(l)
-        e = e/eV
-        plt.plot(w, t, label="E=%s"%(e,))
-        w = []
-        t = []
-    plt.ylabel('T - transmission probability (%)')
-    plt.xlabel('width of a barrier (nm)')
-    plt.legend(bbox_to_anchor=(1,1), loc=2)
-    plt.show()
+    #    eV = 1.602176e-19 # J  # declaration of variables
+    m0 = 9.10938356
+    mw = 0.067 * m0
+    mb = 0.10 * m0
+    V0 = 0.334
+    hbar = 1.0545718
+    E = []
+    w = [3, 5, 8]
     
-zadanie3()
+    for wi in w:
+        T = []
+        E = []
+        for e in np.linspace(0.01, 1.6, 10000):
+            if e == V0:
+                continue
+            elif e < V0:
+                E.append(e)
+                k1 = np.sqrt((2 * mw * e) / (hbar**2))
+                k2 = np.sqrt((2 * mb * (V0 - e)) / hbar**2)
+                t = 1 / (1 + 0.25 * (k1 / k2 + k2 / k1)**2 * (np.sinh(k2 * wi))**2)
+                T.append(t)
+            else:
+                E.append(e)
+                k1 = np.sqrt((2 * mw * e) / (hbar**2))
+                k2 = np.sqrt((2 * mb * (e - V0)) / hbar**2)
+                t = 1 / (1 + 0.25 * (k1 / k2 - k2 / k1)**2 * (np.sin(k2 * wi))**2)
+                T.append(t)
+        plt.plot(E, T, label = "w =%s nm" %wi)
+    plt.legend()
+    plt.grid()
+    plt.xlabel('E [eV]')
+    plt.ylabel('Transmission coefficient \nT [0-1]')
+    plt.show()
+
+
+#zadanie1()
+#zadanie2()    
+#zadanie3()
